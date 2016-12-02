@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+
+// SUB#1: WE need to use the Subscription to interact with an Observable object.
+import { Subscription } from 'rxjs/Subscription';
 
 import {IProduct } from './product';
 import { ProductService } from './product.service'
@@ -13,8 +16,10 @@ import { ProductService } from './product.service'
 })
 export class ProductDetailComponent implements OnInit {
     pageTitle: string = "Product Detail";
-    errorMessage: string;
     product: IProduct;
+    errorMessage: string;
+    // SUB#2: Declare a private Subscription variable.
+    private sub: Subscription;
 
     constructor(private _route: ActivatedRoute, 
     private _router: Router,
@@ -27,13 +32,28 @@ export class ProductDetailComponent implements OnInit {
     ngOnInit(): void {
         // 'let' defines a block scoped variable (new to ES 2015).
         // '+' is a JS short cut to convert a string a number.
-        let id = +this._route.snapshot.params['id'];
-        this.pageTitle += `: ${id}`;
+        //let id = +this._route.snapshot.params['id'];
+        //this.pageTitle += `: ${id}`;
 
-        this._productService.getProduct(id)
-                .subscribe(product => this.product = product,
-                    error => this.errorMessage = <any>error);
+        // SUB#4: Instantiate the Subscription variable.
+        this.sub = this._route.params.subscribe(
+            params => {
+                let id = +params['id'];
+                this.getProduct(id);
+            }
+        );
+    }
 
+    // SUB#5: Add the OnDestroy hock (after importing above) to unsubscribe the Subscription
+    ngOnDestroy() {
+        this.sub.unsubscribe();
+    }
+
+    // SUB#3: Create a wrapper method to call the method within the service.
+    getProduct(id: number) {
+        this._productService.getProduct(id).subscribe(
+            product  => this.product = product,
+            error => this.errorMessage = <any>error);
     }
 
     onBack():void {

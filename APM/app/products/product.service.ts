@@ -28,10 +28,8 @@ export class ProductService {
     getProduct(id: number): Observable<IProduct> {
         // Translate the array of Response to an array of IProducts using the map operator.
         // Note: the json result may be wrapped in property e.g. data.
-        return this._http.get(this._productUrl)
-            .map((response: Response) => <IProduct[]> response.json())
-            .do(data => console.log('All: ' +  JSON.stringify(data)))
-            .catch(this.handleError);
+        return this.getProducts()
+            .map((products: IProduct[]) => products.find(p => p.productId === id));
     }
 
     private handleError(error: Response) {
