@@ -26,7 +26,7 @@ import { ProductService } from './products/product.service'
     //</div>
     //`,
     // Register our service with the Angular injector...
-    providers: [ ProductService ]
+    //providers: [ ProductService ]
 })
 export class AppComponent { 
     pageTitle: string = 'Acme Product Management';
